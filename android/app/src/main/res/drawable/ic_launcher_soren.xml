@@ -1,0 +1,33 @@
+<vector xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 512 512">
+  <!-- 背景圆形 - 深绿色 -->
+  <circle cx="256" cy="256" r="256" fill="#1B5E20"/>
+
+  <!-- 内圆光晕 -->
+  <circle cx="256" cy="256" r="220" fill="#2E7D32" opacity="0.5"/>
+
+  <!-- 三刀流标志 - 简化版 -->
+  <!-- 中间剑（垂直） -->
+  <rect x="248" y="120" width="16" height="280" rx="3" fill="#C0C0C0"/>
+  <rect x="244" y="110" width="24" height="20" rx="2" fill="#808080"/>
+  <circle cx="256" cy="105" r="8" fill="#A0A0A0"/>
+
+  <!-- 左侧剑（倾斜） -->
+  <g transform="rotate(-30 256 256)">
+    <rect x="248" y="140" width="16" height="260" rx="3" fill="#D0D0D0"/>
+    <rect x="244" y="130" width="24" height="20" rx="2" fill="#909090"/>
+  </g>
+
+  <!-- 右侧剑（倾斜） -->
+  <g transform="rotate(30 256 256)">
+    <rect x="248" y="140" width="16" height="260" rx="3" fill="#B8B8B8"/>
+    <rect x="244" y="130" width="24" height="20" rx="2" fill="#888888"/>
+  </g>
+
+  <!-- 头巾标志 -->
+  <ellipse cx="256" cy="380" rx="60" ry="20" fill="#0D3B0F"/>
+  <rect x="196" y="370" width="120" height="20" rx="4" fill="#1B5E20"/>
+
+  <!-- 交叉缎带 -->
+  <path d="M220 380 Q256 350 292 380" stroke="#0D3B0F" stroke-width="8" fill="none"/>
+</vector>

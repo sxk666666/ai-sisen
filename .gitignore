@@ -1,0 +1,63 @@
+# ============ Android ============
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/app/release/
+*.apk
+*.aab
+*.keystore
+*.jks
+
+# Android Studio
+.idea/
+*.iml
+.DS_Store
+
+# ============ Python 服务端 ============
+server/venv/
+server/__pycache__/
+server/*.pyc
+server/*.pyo
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+
+# 日志 / 测试输出
+server/*_stderr.txt
+server/*_stdout.txt
+server/test_*.txt
+server/test_api_error.txt
+server/test_api_result.txt
+server/test_error.txt
+server/test_output.txt
+
+# KataGo 自动调优缓存（本地路径，不共享）
+*.bin.gz
+*.cfg
+opencltuning/
+
+# ============ 项目根目录 ============
+app-debug.apk
+app-release.apk
+*.hprof
+
+# 数据目录（棋谱数据不上传）
+data/
+
+# foxwq 脚本临时文件
+foxwq_scripts/__pycache__/
+
+# ============ 通用 ============
+.env
+.env.local
+Thumbs.db
+desktop.ini
+
+# 日志文件（根目录 + server/）
+*.log
+build.log
+server/debug.log
+server/debug_err.log
+server/stderr.log
+server/stdout.log

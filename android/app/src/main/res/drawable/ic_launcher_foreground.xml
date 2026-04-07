@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+  <!-- 背景光晕 -->
+  <circle cx="54" cy="54" r="44" fill="#2E7D32" opacity="0.25"/>
+
+  <!-- 左侧斜剑（-28度）：旋转后的外边框，简化矩形坐标 -->
+  <!-- 剑身主段 (x≈38, y≈23 到 x≈57, y≈82) -->
+  <path
+    android:fillColor="#C0C0C0"
+    android:pathData="M40,25 L55,22 L57,81 L42,84 Z"/>
+  <!-- 剑身中段高亮 -->
+  <path
+    android:fillColor="#E0E0E0"
+    android:pathData="M43,26 L53,24 L54,80 L44,82 Z"/>
+
+  <!-- 右侧斜剑（+28度） -->
+  <path
+    android:fillColor="#B0B0B0"
+    android:pathData="M51,22 L66,25 L68,84 L53,81 Z"/>
+  <path
+    android:fillColor="#D0D0D0"
+    android:pathData="M54,24 L64,26 L63,82 L53,80 Z"/>
+
+  <!-- 中间垂直剑（主剑） -->
+  <path
+    android:fillColor="#E8E8E8"
+    android:pathData="M50,20 L58,20 L59,88 L49,88 Z"/>
+  <!-- 中间剑高光 -->
+  <path
+    android:fillColor="#FFFFFF"
+    android:pathData="M52,21 L56,21 L56.5,87 L51.5,87 Z"/>
+
+  <!-- 剑柄-护手 -->
+  <path android:fillColor="#505050" android:pathData="M46,88 L62,88 L64,92 L44,92 Z"/>
+  <path android:fillColor="#808080" android:pathData="M47,88 L61,88 L62,91 L46,91 Z"/>
+  <!-- 剑柄 -->
+  <path android:fillColor="#3D3D3D" android:pathData="M49,92 L59,92 L58,102 L50,102 Z"/>
+  <path android:fillColor="#5D5D5D" android:pathData="M50,92 L56,92 L55.5,101 L50.5,101 Z"/>
+
+  <!-- 剑首（柄尾） -->
+  <circle cx="54" cy="103" r="3.5" fill="#505050"/>
+  <circle cx="54" cy="103" r="2" fill="#707070"/>
+
+  <!-- 绿色头巾 -->
+  <!-- 主体横条 -->
+  <path android:fillColor="#0D3B0F" android:pathData="M32,76 L76,76 L76,83 L32,83 Z"/>
+  <!-- 高光 -->
+  <path android:fillColor="#1B5E20" android:pathData="M33,77 L75,77 L75,80 L33,80 Z"/>
+  <!-- 飘带左 -->
+  <path
+    android:fillColor="#1B5E20"
+    android:pathData="M32,76 L28,84 L36,84 L40,76 Z"/>
+  <!-- 飘带右 -->
+  <path
+    android:fillColor="#0D3B0F"
+    android:pathData="M76,76 L80,84 L72,84 L68,76 Z"/>
+
+</vector>
