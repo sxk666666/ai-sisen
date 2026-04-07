@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
@@ -30,7 +31,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.platform.LocalContext
 import com.goanalyzer.data.FoxwqClient
+import com.goanalyzer.data.FoxwqDownloader
 import com.goanalyzer.data.FoxwqGame
 import com.goanalyzer.data.FoxwqFollowRepository
 import com.goanalyzer.data.FoxwqUser
@@ -49,6 +52,13 @@ private sealed class FoxwqDialogState {
     data object Followed : FoxwqDialogState()
 }
 
+// ============ 下载反馈状态 ============
+private data class DownloadFeedback(
+    val isLoading: Boolean = false,
+    val message: String = "",
+    val isError: Boolean = false
+)
+
 // ============ 主对话框 ============
 @Composable
 fun FoxwqImportDialog(
@@ -59,6 +69,9 @@ fun FoxwqImportDialog(
 ) {
     var state by remember { mutableStateOf<FoxwqDialogState>(FoxwqDialogState.Search) }
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val downloader = remember { FoxwqDownloader(context) }
+    var downloadFeedback by remember { mutableStateOf<DownloadFeedback>(DownloadFeedback()) }
 
     // 初始搜索用户名
     var searchText by remember { mutableStateOf("") }
@@ -86,6 +99,9 @@ fun FoxwqImportDialog(
             tonalElevation = 6.dp,
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
+                // ---- Snackbar 反馈 ----
+                val snackbarHostState = remember { SnackbarHostState() }
+
                 // ---- 顶部标题栏 ----
                 TopAppBar(
                     title = {
@@ -205,6 +221,43 @@ fun FoxwqImportDialog(
                                         )
                                     }
                                 },
+                                onDownloadClick = { game ->
+                                    downloadFeedback = DownloadFeedback(isLoading = true, message = "正在保存...")
+                                    scope.launch {
+                                        val result = foxwqClient.getSgf(game.chessId)
+                                        result.fold(
+                                            onSuccess = { sgf ->
+                                                val saveResult = downloader.downloadGame(sgf, game)
+                                                saveResult.fold(
+                                                    onSuccess = { path ->
+                                                        downloadFeedback = DownloadFeedback(
+                                                            isLoading = false,
+                                                            message = "已保存到 $path",
+                                                            isError = false
+                                                        )
+                                                        snackbarHostState.showSnackbar("已保存到 $path")
+                                                    },
+                                                    onFailure = { e ->
+                                                        downloadFeedback = DownloadFeedback(
+                                                            isLoading = false,
+                                                            message = "保存失败: ${e.message}",
+                                                            isError = true
+                                                        )
+                                                        snackbarHostState.showSnackbar("保存失败: ${e.message}")
+                                                    }
+                                                )
+                                            },
+                                            onFailure = { e ->
+                                                downloadFeedback = DownloadFeedback(
+                                                    isLoading = false,
+                                                    message = "获取棋谱失败: ${e.message}",
+                                                    isError = true
+                                                )
+                                                snackbarHostState.showSnackbar("获取棋谱失败: ${e.message}")
+                                            }
+                                        )
+                                    }
+                                },
                                 onLoadMore = {
                                     val uid = currentUser?.uid ?: return@GameListPane
                                     state = FoxwqDialogState.UserReady(s.user, s.games, true)
@@ -242,6 +295,7 @@ fun FoxwqImportDialog(
                                 loadingMore = false,
                                 listError = s.error,
                                 onGameClick = {},
+                                onDownloadClick = {},
                                 onLoadMore = {},
                                 followRepository = followRepository,
                                 onFollowToggle = { user ->
@@ -297,6 +351,8 @@ fun FoxwqImportDialog(
                 }
 
                 // ---- 底部提示 ----
+                SnackbarHost(hostState = snackbarHostState)
+
                 Surface(
                     color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
                     tonalElevation = 0.dp
@@ -449,6 +505,7 @@ private fun GameListPane(
     listError: String? = null,
     onGameClick: (FoxwqGame) -> Unit,
     onLoadMore: () -> Unit,
+    onDownloadClick: (FoxwqGame) -> Unit,
     followRepository: FoxwqFollowRepository? = null,
     onFollowToggle: ((FoxwqUser) -> Unit)? = null,
 ) {
@@ -556,7 +613,8 @@ private fun GameListPane(
                 items(games, key = { it.chessId }) { game ->
                     GameListItem(
                         game = game,
-                        onClick = { onGameClick(game) }
+                        onClick = { onGameClick(game) },
+                        onDownloadClick = { onDownloadClick(game) }
                     )
                 }
 
@@ -580,6 +638,7 @@ private fun GameListPane(
 private fun GameListItem(
     game: FoxwqGame,
     onClick: () -> Unit,
+    onDownloadClick: () -> Unit,
 ) {
     Surface(
         modifier = Modifier
@@ -595,10 +654,10 @@ private fun GameListItem(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             // 结果标识
-            val (icon, iconColor) = when (game.winner) {
-                1 -> "⚫" to MaterialTheme.colorScheme.onSurface
-                2 -> "⚪" to MaterialTheme.colorScheme.onSurfaceVariant
-                else -> "🟡" to MaterialTheme.colorScheme.tertiary
+            val icon = when (game.winner) {
+                1 -> "⚫"
+                2 -> "⚪"
+                else -> "🟡"
             }
             Text(icon, fontSize = 16.sp)
 
@@ -617,6 +676,19 @@ private fun GameListItem(
                     game.displaySubtitle,
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+
+            // 下载按钮
+            IconButton(
+                onClick = onDownloadClick,
+                modifier = Modifier.size(36.dp)
+            ) {
+                Icon(
+                    Icons.Default.Download,
+                    "下载",
+                    modifier = Modifier.size(20.dp),
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
 
