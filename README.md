@@ -1,88 +1,50 @@
-# Go Analyzer - 围棋 AI 分析 App
+# AI.SISEN - 围棋 AI 分析应用
 
-通过手机上传棋谱（SGF），调用电脑端 KataGo 进行 AI 分析。
+基于 KataGo 引擎的围棋棋谱分析工具，支持 Android 客户端。
+
+## 功能特点
+
+- 📋 **棋谱导入**：支持本地 SGF 文件导入、野狐棋院账号导入
+- 🤖 **AI 分析**：KataGo 引擎（GPU 加速）胜率分析、最优着法推荐
+- 📊 **胜率曲线**：贝塞尔平滑曲线，带移动平均线和失误标记
+- 🎯 **复盘功能**：自动标注失误/严重失误，展示 AI 推荐手
+- 🧩 **死活题**：自动从棋谱中提取死活题（仅失误/严重失误）
+- 🎨 **精美棋盘**：3D 棋子渐变、木纹棋盘、玻璃态 PV 预览
 
 ## 架构
 
 ```
-[Android App (Kotlin + Jetpack Compose)]
-    ↕ HTTP REST API (局域网 / 内网穿透)
-[电脑端 Python 服务 (FastAPI)]
+Android 客户端 (Kotlin/Jetpack Compose)
+    ↕ HTTP
+Python FastAPI 服务端
     ↕ stdin/stdout JSON
-[KataGo Analysis Engine]
+KataGo 分析引擎 (OpenCL GPU)
 ```
 
 ## 快速开始
 
-### 电脑端
+### 服务端
 
-1. **安装依赖**
-   ```bash
-   cd server
-   pip install -r requirements.txt
-   ```
-
-2. **配置路径**
-   ```bash
-   python setup_wizard.py
-   ```
-   向导会自动搜索 KaTrain 安装目录，找到 KataGo 可执行文件和模型。
-   也可手动编辑 `config.py`。
-
-3. **启动服务**
-   ```bash
-   python server.py
-   # 或者直接双击 start.bat
-   ```
-   服务启动后监听 `0.0.0.0:8088`
-
-### Android 端
-
-1. 用 Android Studio 打开 `android/` 目录
-2. Build & Run 到手机
-3. 进入设置页面，输入电脑 IP 地址
-4. 选择 SGF 棋谱文件，点击分析
-
-## 功能
-
-- ✅ SGF 棋谱解析与显示
-- ✅ AI 全局分析（胜率、推荐手、失误点）
-- ✅ 胜率曲线图
-- ✅ 单步分析详情（候选手、变化图）
-- ✅ 棋盘上标记失误点
-- ✅ 棋谱前后导航
-- ✅ 内网穿透支持（Tailscale / frp / ngrok）
-
-## API 接口
-
-| 接口 | 方法 | 说明 |
-|------|------|------|
-| `/` | GET | 健康检查 |
-| `/api/analyze` | POST (multipart) | 上传 SGF 文件分析 |
-| `/api/analyze-text` | POST (form) | 发送 SGF 文本分析 |
-| `/api/discover` | GET | 服务发现 |
-| `/ws/analyze` | WebSocket | 实时分析进度 |
-
-## 目录结构
-
+```bash
+cd server
+pip install -r requirements.txt
+python server.py
 ```
-go-analyzer/
-├── server/                    # 电脑端 Python 服务
-│   ├── server.py              # FastAPI 主服务
-│   ├── config.py              # 配置文件
-│   ├── setup_wizard.py        # 配置向导
-│   ├── requirements.txt       # Python 依赖
-│   └── start.bat              # Windows 启动脚本
-│
-└── android/                   # Android App
-    ├── app/src/main/java/com/goanalyzer/
-    │   ├── data/              # 数据层（API、SGF解析、模型）
-    │   ├── ui/
-    │   │   ├── board/         # 棋盘组件
-    │   │   ├── chart/         # 胜率曲线
-    │   │   ├── analysis/      # 分析详情面板
-    │   │   ├── screen/        # 页面（主页面、设置）
-    │   │   └── theme/         # 主题
-    │   └── GoAnalyzerApp.kt   # Application
-    └── build.gradle.kts
-```
+
+默认端口：**8088**
+
+### Android 客户端
+
+用 Android Studio 打开 `android/` 目录，构建并运行。
+
+需要在 App 设置页填写服务端地址（如 `http://192.168.x.x:8088`）。
+
+## 环境要求
+
+- Python 3.10+
+- KataGo 1.16+ (OpenCL 或 CUDA 版本推荐)
+- Android 8.0+ (API 26+)
+
+## License
+
+MIT
